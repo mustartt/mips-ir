@@ -32,8 +32,8 @@ void InterferenceGraph::color() {
 std::unordered_map<RegisterID, Color> InterferenceGraph::getColoring() {
     if (!m_colored) throw std::runtime_error("graph is not colored");
     std::unordered_map<RegisterID, Color> coloring;
-    for (const auto&[id, reg]: m_registerContext) {
-        coloring[id] = reg->getColor();
+    for (const auto &kv: m_registerContext) {
+        coloring[kv.first] = kv.second->getColor();
     }
     return coloring;
 }

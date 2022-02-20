@@ -6,6 +6,8 @@
 #include "MemoryIR/IRContext.h"
 #include "MemoryIR/IRbuilder.h"
 #include "MemoryIR/Module.h"
+#include "RegisterAllocation/InterferenceGraph.h"
+#include "RegisterAllocation/LivenessAnalyzer.h"
 
 int main() {
     using namespace mipsir;
@@ -13,31 +15,26 @@ int main() {
     auto ctx = std::make_unique<IRContext>();
     auto builder = std::make_unique<IRBuilder>(ctx.get());
     auto module = std::make_unique<Module>(ctx.get());
-
-    // globals
-    module->createGlobal("const_int", 10);
-    module->createGlobal("const_int_arr", {1, 2, 3, 4, 5, 6, 7, 8, 10});
-
-    // functions
-    Function *callee = module->createFunction("random_function", {}, true);
-
     const std::vector<std::string> args{"a", "b"};
     Function *function = module->createFunction("add", args);
     Block *entryBlock = ctx->createBlock(function);
-    Block *exitBlock = ctx->createBlock(function);
 
     builder->setInsertPoint(entryBlock);
-    Value *temp1 = function->getArgs()[0];
-    Value *temp2 = function->getArgs()[1];
-    builder->createCallInstr(callee, {temp1, temp2});
-    builder->createCmpInstruction(CmpInstruction::CmpOp::Equal, temp1, temp2);
+    Value *a = function->getArgs()[0];
+    Value *b = function->getArgs()[1];
+    Value *c = builder->createAddInstr(a, b);
+    Value *d = ctx->createConstantInt(3);
 
-    builder->createBranch(exitBlock);
-
-    builder->setInsertPoint(exitBlock);
-    builder->createReturn(builder->createAddInstr(temp1, temp2));
+    builder->createReturn(builder->createAddInstr(d, c));
 
     module->print(std::cout);
+
+    InterferenceGraph g = LivenessAnalyzer::constructRegisterInterferenceGraph(function);
+    g.color();
+    auto coloring = g.getColoring();
+    for (auto &pair: coloring) {
+        std::cout << "%" << pair.first << " -> " << pair.second << std::endl;
+    }
 
     return 0;
 }

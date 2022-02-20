@@ -69,17 +69,18 @@ void Function::print(std::ostream &ostream) {
             }
             instr->print(ostream);
             ostream << " ";
-
-            for (const auto &operand: instr->getOperands()) {
-                printLiteralOrRegister(operand);
-            }
+            const auto call = dynamic_cast<CallInstruction *>(instr);
             const auto branch = dynamic_cast<BranchInstruction *>(instr);
+            if (!call) {
+                for (const auto &operand: instr->getOperands()) {
+                    printLiteralOrRegister(operand);
+                }
+            }
             if (branch) {
                 for (const auto &out: branch->getOutbound()) {
                     ostream << labelAssignment[out] << " ";
                 }
             }
-            const auto call = dynamic_cast<CallInstruction *>(instr);
             if (call) {
                 ostream << call->getCalleName() << "( ";
                 for (const auto &arg: call->getFunctionArguments()) {

@@ -34,6 +34,8 @@ class InterferenceGraph final {
   public:
     InterferenceGraph() = default;
     ~InterferenceGraph() = default;
+    InterferenceGraph(const InterferenceGraph &) = delete;
+    InterferenceGraph(InterferenceGraph &&) = default;
 
     void addInterference(RegisterID a, RegisterID b);
     void color();

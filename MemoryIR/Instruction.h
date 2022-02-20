@@ -32,7 +32,7 @@ class CallInstruction : public Instruction {
     CallInstruction(Function *callee, std::vector<Value *> args) : callee(callee), args(std::move(args)) {}
     [[nodiscard]] bool hasReturnValue() const override { return callee->hasReturnValue(); }
     void print(std::ostream &ostream) override { ostream << "call"; }
-    std::vector<Value *> getOperands() override { return {}; }
+    std::vector<Value *> getOperands() override { return args; }
     [[nodiscard]] const std::vector<Value *> &getFunctionArguments() const { return args; }
     [[nodiscard]] const std::string &getCalleName() const { return callee->getName(); }
 };
