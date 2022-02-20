@@ -25,6 +25,8 @@ int main() {
     Value *temp1 = function->getArgs()[0];
     Value *temp2 = function->getArgs()[1];
     builder->createCallInstr(callee, {temp1, temp2});
+    builder->createCmpInstruction(CmpInstruction::CmpOp::Equal, temp1, temp2);
+
     builder->createBranch(exitBlock);
 
     builder->setInsertPoint(exitBlock);

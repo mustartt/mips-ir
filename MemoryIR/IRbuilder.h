@@ -59,6 +59,10 @@ class IRBuilder {
 //        return createInstruction<IndirectCallInstruction>(callee, ptr, std::move(args));
 //    }
 
+    Value *createCmpInstruction(CmpInstruction::CmpOp cmpOp, Value *lhs, Value *rhs) {
+        return createInstruction<CmpInstruction>(cmpOp, lhs, rhs);
+    }
+
   private:
     template<typename InstrType, typename... Args>
     Instruction *createInstruction(Args &&... args) {

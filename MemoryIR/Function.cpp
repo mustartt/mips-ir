@@ -34,7 +34,7 @@ void Function::print(std::ostream &ostream) {
     std::unordered_map<Block *, std::string> labelAssignment;
 
     Register nextAvailable = 1;
-    Label nextLabel = 1;
+    Label nextLabel = 0;
     const auto bodyBlocks = getFunctionBlocks();
     for (const auto &arg: m_args) {
         virtualAssignment[arg] = nextAvailable++;

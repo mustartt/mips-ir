@@ -7,6 +7,7 @@
 
 #include <utility>
 #include <vector>
+#include <unordered_map>
 
 #include "Function.h"
 
@@ -22,7 +23,6 @@ class Instruction : public Value {
     [[nodiscard]] virtual bool hasReturnValue() const = 0;
 };
 
-class CmpInstruction : public Instruction {};
 class PointerCalculation : public Instruction {};
 
 class CallInstruction : public Instruction {
@@ -118,35 +118,57 @@ class BinaryInstruction : public Instruction {
     Value *rhs;
   public:
     BinaryInstruction(Value *lhs, Value *rhs) : lhs(lhs), rhs(rhs) {}
+    std::vector<Value *> getOperands() override { return {lhs, rhs}; }
     [[nodiscard]] bool hasReturnValue() const override { return true; }
 };
 
 class AddInstruction : public BinaryInstruction {
   public:
     AddInstruction(Value *lhs, Value *rhs) : BinaryInstruction(lhs, rhs) {}
-    std::vector<Value *> getOperands() override { return {lhs, rhs}; }
     void print(std::ostream &ostream) override { ostream << "add"; }
 };
 
 class SubInstruction : public BinaryInstruction {
   public:
     SubInstruction(Value *lhs, Value *rhs) : BinaryInstruction(lhs, rhs) {}
-    std::vector<Value *> getOperands() override { return {lhs, rhs}; }
     void print(std::ostream &ostream) override { ostream << "sub"; }
 };
 
 class MulInstruction : public BinaryInstruction {
   public:
     MulInstruction(Value *lhs, Value *rhs) : BinaryInstruction(lhs, rhs) {}
-    std::vector<Value *> getOperands() override { return {lhs, rhs}; }
     void print(std::ostream &ostream) override { ostream << "mul"; }
 };
 
 class DivInstruction : public BinaryInstruction {
   public:
     DivInstruction(Value *lhs, Value *rhs) : BinaryInstruction(lhs, rhs) {}
-    std::vector<Value *> getOperands() override { return {lhs, rhs}; }
     void print(std::ostream &ostream) override { ostream << "div"; }
+};
+
+class CmpInstruction : public BinaryInstruction {
+  public:
+    enum class CmpOp {
+      Equal, NotEqual, LessThan, GreaterThan, GreaterThanEqual, LessThanEqual
+    };
+  private:
+    CmpOp op;
+  private:
+    static std::string getEnumCmp(CmpInstruction::CmpOp op) {
+        std::unordered_map<CmpOp, std::string> operatorMap{
+            {CmpOp::Equal, "eq"},
+            {CmpOp::NotEqual, "ne"},
+            {CmpOp::LessThan, "lt"},
+            {CmpOp::GreaterThan, "gt"},
+            {CmpOp::GreaterThanEqual, "ge"},
+            {CmpOp::LessThanEqual, "le"}
+        };
+        return operatorMap.at(op);
+    }
+  public:
+    CmpInstruction(CmpInstruction::CmpOp op, Value *lhs, Value *rhs)
+        : BinaryInstruction(lhs, rhs), op(op) {}
+    void print(std::ostream &ostream) override { ostream << "cmp " << getEnumCmp(op); }
 };
 
 }
