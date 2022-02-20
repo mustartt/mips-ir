@@ -2,6 +2,9 @@
 // Created by henry on 2022-02-19.
 //
 
+#include <unordered_set>
+#include <queue>
+
 #include "IRContext.h"
 
 #include "Function.h"
@@ -33,34 +36,58 @@ void Function::print(std::ostream &ostream) {
         virtualAssignment[arg] = nextAvailable++;
     }
 
-    for (const auto &block: m_blocks) {
+    const auto bodyBlocks = getFunctionBlocks();
+    for (const auto &block: bodyBlocks) {
         for (const auto &instr: block->getInstructions()) {
             if (instr->hasReturnValue()) virtualAssignment[instr] = nextAvailable++;
         }
     }
 
     Label nextLabel = 1;
-    for (const auto &block: m_blocks) {
+    for (const auto &block: bodyBlocks) {
         ostream << "  label_" << nextLabel << ":" << std::endl;
         for (const auto &instr: block->getInstructions()) {
+            ostream << "    ";
             if (virtualAssignment.count(instr)) {
-                ostream << "    %" << virtualAssignment[instr] << " = ";
-                instr->print(ostream);
-                ostream << " ";
-                for (const auto &operand: instr->getOperands()) {
-                    if (virtualAssignment.count(operand)) {
-                        ostream << "%" << virtualAssignment[operand];
-                    } else {
-                        operand->print(ostream);
-                    }
-                    ostream << " ";
+                ostream << "%" << virtualAssignment[instr] << " = ";
+            }
+            instr->print(ostream);
+            ostream << " ";
+            for (const auto &operand: instr->getOperands()) {
+                if (virtualAssignment.count(operand)) {
+                    ostream << "%" << virtualAssignment[operand];
+                } else {
+                    operand->print(ostream);
                 }
+                ostream << " ";
             }
             ostream << std::endl;
         }
     }
 
     ostream << "}";
+}
+
+std::vector<Block *> Function::getFunctionBlocks() const {
+    if (!m_entryBlock) return {};
+    std::vector<Block *> results;
+    std::unordered_set<Block *> visited;
+    std::queue<Block *> nextBlocks;
+    visited.insert(m_entryBlock);
+    nextBlocks.push(m_entryBlock);
+    while (!nextBlocks.empty()) {
+        auto s = nextBlocks.front();
+        results.push_back(s);
+        nextBlocks.pop();
+        for (const auto &out: s->getOutboundingEdge()) {
+            if (!visited.count(out)) {
+                visited.insert(out);
+                nextBlocks.push(out);
+            }
+        }
+    }
+
+    return results;
 }
 
 }

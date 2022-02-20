@@ -22,7 +22,7 @@ int main() {
     Value *temp1 = builder->createAddInstr(function->getArgs()[1], function->getArgs()[0]);
     Value *temp2 = builder->createMulInstr(function->getArgs()[0], function->getArgs()[1]);
     Value *val = ctx->createConstantInt(10);
-    builder->createAddInstr(temp1, val);
+    builder->createReturn(builder->createAddInstr(temp1, val));
 
     function->print(std::cout);
 

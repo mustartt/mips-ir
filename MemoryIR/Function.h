@@ -27,12 +27,13 @@ class Function : public Value {
     IRContext *m_context;
     std::string m_name;
     std::vector<Argument *> m_args;
-    std::vector<Block *> m_blocks;
+    Block *m_entryBlock;
   public:
     Function(IRContext *ctx, std::string name, const std::vector<std::string> &args);
-    std::vector<Block *> &getFunctionBlocks() { return m_blocks; }
+    [[nodiscard]] std::vector<Block *> getFunctionBlocks() const;
     std::vector<Argument *> &getArgs() { return m_args; }
     void print(std::ostream &ostream) override;
+    void setEntryBlock(Block *entryBlock) { m_entryBlock = entryBlock; }
 };
 
 }
