@@ -31,21 +31,23 @@ void Function::print(std::ostream &ostream) {
     using Label = uint32_t;
 
     std::unordered_map<Value *, Register> virtualAssignment;
+    std::unordered_map<Block *, std::string> labelAssignment;
+
     Register nextAvailable = 1;
+    Label nextLabel = 1;
+    const auto bodyBlocks = getFunctionBlocks();
     for (const auto &arg: m_args) {
         virtualAssignment[arg] = nextAvailable++;
     }
-
-    const auto bodyBlocks = getFunctionBlocks();
     for (const auto &block: bodyBlocks) {
         for (const auto &instr: block->getInstructions()) {
             if (instr->hasReturnValue()) virtualAssignment[instr] = nextAvailable++;
         }
+        labelAssignment[block] = "label_" + std::to_string(nextLabel++);
     }
 
-    Label nextLabel = 1;
     for (const auto &block: bodyBlocks) {
-        ostream << "  label_" << nextLabel << ":" << std::endl;
+        ostream << "  " << labelAssignment[block] << ":" << std::endl;
         for (const auto &instr: block->getInstructions()) {
             ostream << "    ";
             if (virtualAssignment.count(instr)) {
@@ -53,6 +55,7 @@ void Function::print(std::ostream &ostream) {
             }
             instr->print(ostream);
             ostream << " ";
+
             for (const auto &operand: instr->getOperands()) {
                 if (virtualAssignment.count(operand)) {
                     ostream << "%" << virtualAssignment[operand];
@@ -60,6 +63,12 @@ void Function::print(std::ostream &ostream) {
                     operand->print(ostream);
                 }
                 ostream << " ";
+            }
+            const auto branch = dynamic_cast<BranchInstruction *>(instr);
+            if (branch) {
+                for (const auto &out: branch->getOutbound()) {
+                    ostream << labelAssignment[out] << " ";
+                }
             }
             ostream << std::endl;
         }

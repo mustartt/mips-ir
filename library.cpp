@@ -17,12 +17,16 @@ int main() {
     const std::vector<std::string> args{"a", "b"};
     Function *function = module->createFunction("add", args);
     Block *entryBlock = ctx->createBlock(function);
-    builder->setInsertPoint(entryBlock);
+    Block *exitBlock = ctx->createBlock(function);
 
-    Value *temp1 = builder->createAddInstr(function->getArgs()[1], function->getArgs()[0]);
-    Value *temp2 = builder->createMulInstr(function->getArgs()[0], function->getArgs()[1]);
-    Value *val = ctx->createConstantInt(10);
-    builder->createReturn(builder->createAddInstr(temp1, val));
+    builder->setInsertPoint(entryBlock);
+    Value *temp1 = function->getArgs()[0];
+    Value *temp2 = function->getArgs()[1];
+    builder->createAddInstr(temp2, temp1);
+    builder->createBranch(exitBlock);
+
+    builder->setInsertPoint(exitBlock);
+    builder->createReturn(builder->createAddInstr(temp1, temp2));
 
     function->print(std::cout);
 

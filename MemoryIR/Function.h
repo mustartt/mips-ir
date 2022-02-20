@@ -34,6 +34,7 @@ class Function : public Value {
     std::vector<Argument *> &getArgs() { return m_args; }
     void print(std::ostream &ostream) override;
     void setEntryBlock(Block *entryBlock) { m_entryBlock = entryBlock; }
+    [[nodiscard]] bool hasBody() const { return m_entryBlock != nullptr; }
 };
 
 }

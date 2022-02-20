@@ -45,6 +45,13 @@ class IRBuilder {
     Value *createMulInstr(Value *lhs, Value *rhs) { return createInstruction<MulInstruction>(lhs, rhs); }
     Value *createDivInstr(Value *lhs, Value *rhs) { return createInstruction<DivInstruction>(lhs, rhs); }
 
+    BranchInstruction *createBranch(Block *block) {
+        return dynamic_cast<BranchInstruction *>(createInstruction<BranchUnconditional>(block));
+    }
+    BranchInstruction *createBranch(Value *cond, Block *condTrue, Block *condFalse) {
+        return dynamic_cast<BranchInstruction *>(createInstruction<BranchConditional>(cond, condTrue, condFalse));
+    }
+
   private:
     template<typename InstrType, typename... Args>
     Instruction *createInstruction(Args &&... args) {

@@ -17,11 +17,12 @@ const std::vector<Instruction *> &Block::getInstructions() const { return m_inst
 std::vector<Instruction *> &Block::getInstructions() { return m_instructions; }
 
 std::vector<Block *> Block::getOutboundingEdge() const {
+    if (m_instructions.empty()) throw std::runtime_error("Block is empty!");
     Instruction *lastInstr = m_instructions.back();
     if (dynamic_cast<ReturnInstruction *>(lastInstr)) return {};
     const auto branch = dynamic_cast<BranchInstruction *>(lastInstr);
     if (branch) return branch->getOutbound();
-    throw std::runtime_error("Block must end with ret or br");
+    throw std::runtime_error("Block must end with ret or br!");
 }
 
 }
