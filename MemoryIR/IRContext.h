@@ -25,6 +25,7 @@ class IRContext {
     std::vector<std::unique_ptr<Block>> m_blocks;
     std::unordered_map<std::string, std::unique_ptr<Function>> m_functions;
     std::unordered_map<std::string, std::unique_ptr<Argument>> m_arguments;
+    std::vector<std::unique_ptr<GlobalVariable>> m_globalVars;
   public:
     IRContext() = default;
     friend class Module;
@@ -34,6 +35,8 @@ class IRContext {
     Constant *createConstantInt(int value);
     Block *createBlock(Function *parent = nullptr);
     Argument *createArgument(const std::string &func, const std::string &argument);
+    GlobalVariable *createGlobal(int value);
+    GlobalVariable *createGlobal(std::vector<int> values);
 };
 
 }

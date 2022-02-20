@@ -29,4 +29,14 @@ Argument *IRContext::createArgument(const std::string &func, const std::string &
     return m_arguments[key].get();
 }
 
+GlobalVariable *IRContext::createGlobal(int value) {
+    m_globalVars.push_back(std::move(std::make_unique<GlobalConstantInt>(value)));
+    return m_globalVars.back().get();
+}
+
+GlobalVariable *IRContext::createGlobal(std::vector<int> values) {
+    m_globalVars.push_back(std::move(std::make_unique<GlobalConstantIntArray>(std::move(values))));
+    return m_globalVars.back().get();
+}
+
 }

@@ -14,6 +14,11 @@ int main() {
     auto builder = std::make_unique<IRBuilder>(ctx.get());
     auto module = std::make_unique<Module>(ctx.get());
 
+    // globals
+    module->createGlobal("const_int", 10);
+    module->createGlobal("const_int_arr", {1, 2, 3, 4, 5, 6, 7, 8, 10});
+
+    // functions
     Function *callee = module->createFunction("random_function", {}, true);
 
     const std::vector<std::string> args{"a", "b"};
@@ -32,7 +37,7 @@ int main() {
     builder->setInsertPoint(exitBlock);
     builder->createReturn(builder->createAddInstr(temp1, temp2));
 
-    function->print(std::cout);
+    module->print(std::cout);
 
     return 0;
 }

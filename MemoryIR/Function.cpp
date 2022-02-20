@@ -26,6 +26,11 @@ void Function::print(std::ostream &ostream) {
         ostream << m_args[i]->getArgName() << ": %" << i + 1;
         if (i + 1 != m_args.size()) ostream << ", ";
     }
+    if (!hasBody()) {
+        ostream << ");" << std::endl;
+        return;
+    }
+
     ostream << ") {" << std::endl;
     using Register = uint32_t;
     using Label = uint32_t;
@@ -85,8 +90,7 @@ void Function::print(std::ostream &ostream) {
             ostream << std::endl;
         }
     }
-
-    ostream << "}";
+    ostream << "}" << std::endl;
 }
 
 std::vector<Block *> Function::getFunctionBlocks() const {
