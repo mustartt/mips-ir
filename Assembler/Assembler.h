@@ -21,8 +21,11 @@ class Assembler {
     void incrementOffset();
   public:
     Assembler() = default;
+    Assembler(const Assembler &) = delete;
+    Assembler(Assembler &&) = default;
 
     void emit(std::ostream &ostream);
+    void print(std::ostream &ostream);
     void printLabels(std::ostream &ostream);
 
     void insertLabel(const std::string &label);

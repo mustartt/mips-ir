@@ -25,6 +25,10 @@ void Word::emit(std::ostream &ostream, const LabelTable &table) {
     }
 }
 
+void Word::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << ".word " << val << std::endl;
+}
+
 void WordLabel::emit(std::ostream &ostream, const LabelTable &table) {
     if (table.count(val)) {
         convert_to_binary(table.at(val), ostream);
@@ -33,9 +37,17 @@ void WordLabel::emit(std::ostream &ostream, const LabelTable &table) {
     }
 }
 
+void WordLabel::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << ".word " << val << std::endl;
+}
+
 void JrInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (val << 21) | (1 << 3);
     convert_to_binary(instr, ostream);
+}
+
+void JrInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "jr $" << val << std::endl;
 }
 
 void JalrInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -43,9 +55,17 @@ void JalrInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void JalrInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "jalr " << val << std::endl;
+}
+
 void AddiInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (1 << 29) | (s << 21) | (t << 16) | (i & 0xffff);
     convert_to_binary(instr, ostream);
+}
+
+void AddiInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "add $" << t << " $" << s << " " << i << std::endl;
 }
 
 void AddInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -53,9 +73,17 @@ void AddInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void AddInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "add $" << dest << " $" << s << " $" << t << std::endl;
+}
+
 void SubInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (0 << 26) | (s << 21) | (t << 16) | (dest << 11) | 34;
     convert_to_binary(instr, ostream);
+}
+
+void SubInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "sub $" << dest << " $" << s << " $" << t << std::endl;
 }
 
 void SltInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -63,9 +91,18 @@ void SltInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void SltInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "slt $" << dest << " $" << s << " $" << t << std::endl;
+}
+
 void SltuInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (0 << 26) | (s << 21) | (t << 16) | (dest << 11) | 43;
     convert_to_binary(instr, ostream);
+}
+
+void SltuInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "sltu $" << dest << " $" << s << " $" << t << std::endl;
+
 }
 
 void BeqInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -80,6 +117,14 @@ void BeqInstr::emit(std::ostream &ostream, const LabelTable &table) {
         } else {
             throw std::runtime_error("Label does not exist!");
         }
+    }
+}
+
+void BeqInstr::print(std::ostream &ostream, const LabelTable &table) {
+    if (label.empty()) {
+        ostream << "beq $" << s << " $" << t << " " << i << std::endl;
+    } else {
+        ostream << "beq $" << s << " $" << t << " " << label << std::endl;
     }
 }
 
@@ -98,9 +143,21 @@ void BneInstr::emit(std::ostream &ostream, const LabelTable &table) {
     }
 }
 
+void BneInstr::print(std::ostream &ostream, const LabelTable &table) {
+    if (label.empty()) {
+        ostream << "bne $" << s << " $" << t << " " << i << std::endl;
+    } else {
+        ostream << "bne $" << s << " $" << t << " " << label << std::endl;
+    }
+}
+
 void LisInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (d << 11) | (1 << 4) | (1 << 2);
     convert_to_binary(instr, ostream);
+}
+
+void LisInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "lis $" << d << std::endl;
 }
 
 void MfloInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -108,9 +165,18 @@ void MfloInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void MfloInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "mflo $" << d << std::endl;
+
+}
+
 void MfhiInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (d << 11) | (1 << 4);
     convert_to_binary(instr, ostream);
+}
+
+void MfhiInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "mfhi $" << d << std::endl;
 }
 
 void MultInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -118,9 +184,17 @@ void MultInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void MultInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "mult $" << s << " $" << t << std::endl;
+}
+
 void MultuInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (s << 21) | (t << 16) | (1 << 4) | (1 << 3) | 1;
     convert_to_binary(instr, ostream);
+}
+
+void MultuInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "multu $" << s << " $" << t << std::endl;
 }
 
 void DivInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -128,9 +202,18 @@ void DivInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void DivInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "div $" << s << " $" << t << std::endl;
+}
+
 void DivuInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (s << 21) | (t << 16) | (1 << 4) | (1 << 3) | 3;
     convert_to_binary(instr, ostream);
+}
+
+void DivuInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "divu $" << s << " $" << t << std::endl;
+
 }
 
 void LwInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -138,9 +221,17 @@ void LwInstr::emit(std::ostream &ostream, const LabelTable &table) {
     convert_to_binary(instr, ostream);
 }
 
+void LwInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "lw $" << t << " $" << i << "($" << s << ")" << std::endl;
+}
+
 void SwInstr::emit(std::ostream &ostream, const LabelTable &table) {
     int instr = (1 << 31) | (1 << 29) | (1 << 27) | (1 << 26) | (s << 21) | (t << 16) | (i & 0xffff);
     convert_to_binary(instr, ostream);
+}
+
+void SwInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "sw $" << t << " $" << i << "($" << s << ")" << std::endl;
 }
 
 }

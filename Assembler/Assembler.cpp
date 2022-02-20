@@ -18,6 +18,19 @@ void Assembler::emit(std::ostream &ostream) {
     }
 }
 
+void Assembler::print(std::ostream &ostream) {
+    std::unordered_map<size_t, std::string> labels;
+    for (const auto&[label, offset]: m_symbolTable) {
+        labels[offset] = label;
+    }
+    size_t offset = 0;
+    for (auto &instr: m_program) {
+        if (labels.count(offset)) ostream << labels[offset] << ": " << std::endl;
+        instr->print(ostream, m_symbolTable);
+        offset += 4;
+    }
+}
+
 void Assembler::printLabels(std::ostream &ostream) {
     for (auto &pair: m_symbolTable) {
         ostream << pair.first << " " << pair.second << std::endl;

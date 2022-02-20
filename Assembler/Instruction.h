@@ -18,6 +18,7 @@ class Instruction {
     size_t currOffset = 0;
     virtual ~Instruction() = default;
     virtual void emit(std::ostream &ostream, const LabelTable &table) = 0;
+    virtual void print(std::ostream &ostream, const LabelTable &table) = 0;
 };
 
 class Word : public Instruction {
@@ -25,6 +26,7 @@ class Word : public Instruction {
   public:
     explicit Word(int64_t val) : val(val) {};
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class WordLabel : public Instruction {
@@ -32,6 +34,7 @@ class WordLabel : public Instruction {
   public:
     explicit WordLabel(std::string val) : val(std::move(val)) {};
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class JrInstr : public Instruction {
@@ -39,6 +42,7 @@ class JrInstr : public Instruction {
   public:
     explicit JrInstr(Register val) : val{val} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class JalrInstr : public Instruction {
@@ -46,6 +50,7 @@ class JalrInstr : public Instruction {
   public:
     explicit JalrInstr(Register val) : val{val} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class AddiInstr : public Instruction {
@@ -55,6 +60,7 @@ class AddiInstr : public Instruction {
   public:
     explicit AddiInstr(Register t, Register s, int i) : t{t}, s{s}, i{i} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class AddInstr : public Instruction {
@@ -64,6 +70,7 @@ class AddInstr : public Instruction {
   public:
     explicit AddInstr(Register dest, Register s, Register t) : dest{dest}, s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class SubInstr : public Instruction {
@@ -73,6 +80,7 @@ class SubInstr : public Instruction {
   public:
     explicit SubInstr(Register dest, Register s, Register t) : dest{dest}, s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class SltInstr : public Instruction {
@@ -82,6 +90,7 @@ class SltInstr : public Instruction {
   public:
     explicit SltInstr(Register dest, Register s, Register t) : dest{dest}, s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class SltuInstr : public Instruction {
@@ -91,6 +100,7 @@ class SltuInstr : public Instruction {
   public:
     explicit SltuInstr(Register dest, Register s, Register t) : dest{dest}, s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class BeqInstr : public Instruction {
@@ -102,6 +112,7 @@ class BeqInstr : public Instruction {
     BeqInstr(Register s, Register t, int i) : s{s}, t{t}, i{i} {}
     BeqInstr(Register s, Register t, std::string label) : s{s}, t{t}, label{std::move(label)} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class BneInstr : public Instruction {
@@ -113,6 +124,7 @@ class BneInstr : public Instruction {
     BneInstr(Register s, Register t, int i) : s{s}, t{t}, i{i} {}
     BneInstr(Register s, Register t, std::string label) : s{s}, t{t}, label{std::move(label)} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class LisInstr : public Instruction {
@@ -120,6 +132,7 @@ class LisInstr : public Instruction {
   public:
     explicit LisInstr(Register d) : d{d} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class MfloInstr : public Instruction {
@@ -127,6 +140,7 @@ class MfloInstr : public Instruction {
   public:
     explicit MfloInstr(Register d) : d{d} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class MfhiInstr : public Instruction {
@@ -134,7 +148,7 @@ class MfhiInstr : public Instruction {
   public:
     explicit MfhiInstr(Register d) : d{d} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
-
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class MultInstr : public Instruction {
@@ -143,6 +157,7 @@ class MultInstr : public Instruction {
   public:
     MultInstr(Register s, Register t) : s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class MultuInstr : public Instruction {
@@ -151,6 +166,7 @@ class MultuInstr : public Instruction {
   public:
     MultuInstr(Register s, Register t) : s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class DivInstr : public Instruction {
@@ -159,6 +175,7 @@ class DivInstr : public Instruction {
   public:
     DivInstr(Register s, Register t) : s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class DivuInstr : public Instruction {
@@ -167,26 +184,27 @@ class DivuInstr : public Instruction {
   public:
     DivuInstr(Register s, Register t) : s{s}, t{t} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class LwInstr : public Instruction {
     Register s;
     Register t;
     int i;
-
   public:
     LwInstr(Register s, Register t, int i) : s{s}, t{t}, i{i} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 class SwInstr : public Instruction {
     Register s;
     Register t;
     int i;
-
   public:
     SwInstr(Register s, Register t, int i) : s{s}, t{t}, i{i} {}
     void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
 }
