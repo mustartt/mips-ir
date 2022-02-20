@@ -56,7 +56,7 @@ LivenessAnalyzer::analyzeMergedLiveRange(Function *function) {
     return mergeLiveRanges(firstAlive, lastAlive);
 }
 
-std::unordered_map<Value *, LivenessAnalyzer::Line>
+std::unordered_map<Value *, LivenessAnalyzer::Register>
 LivenessAnalyzer::getVirtualRegisterAssignment(Function *function) {
     std::unordered_map<Value *, Register> virtualAssignment;
     Register nextAvailable = 1;

@@ -18,7 +18,7 @@ class LivenessAnalyzer {
     using Line = uint32_t;
     using Register = uint32_t;
 
-    static std::unordered_map<Value *, Line> getVirtualRegisterAssignment(Function *function);
+    static std::unordered_map<Value *, Register> getVirtualRegisterAssignment(Function *function);
     static std::unordered_map<Value *, std::pair<Line, Line>> analyzeMergedLiveRange(Function *function);
     static InterferenceGraph constructRegisterInterferenceGraph(Function *function);
 };
