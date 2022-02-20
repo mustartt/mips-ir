@@ -10,8 +10,12 @@
 
 namespace mipsir {
 
-Function *Module::createFunction(const std::string &name, const std::vector<std::string> &args) {
-    m_context->m_functions[name] = std::move(std::make_unique<Function>(m_context, name, args));
+Function *Module::createFunction(const std::string &name,
+                                 const std::vector<std::string> &args,
+                                 bool isVoidType) {
+    m_context->m_functions[name] = std::move(
+        std::make_unique<Function>(m_context, name, args, isVoidType)
+    );
     auto ptr = m_context->m_functions[name].get();
     m_functions[name] = ptr;
     return ptr;

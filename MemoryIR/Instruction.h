@@ -5,7 +5,10 @@
 #ifndef MIPS_IR_MEMORYIR_INSTRUCTION_H_
 #define MIPS_IR_MEMORYIR_INSTRUCTION_H_
 
+#include <utility>
 #include <vector>
+
+#include "Function.h"
 
 #include "Value.h"
 
@@ -19,9 +22,31 @@ class Instruction : public Value {
     [[nodiscard]] virtual bool hasReturnValue() const = 0;
 };
 
-class CallInstruction : public Instruction {};
 class CmpInstruction : public Instruction {};
 class PointerCalculation : public Instruction {};
+
+class CallInstruction : public Instruction {
+    Function *callee;
+    std::vector<Value *> args;
+  public:
+    CallInstruction(Function *callee, std::vector<Value *> args) : callee(callee), args(std::move(args)) {}
+    [[nodiscard]] bool hasReturnValue() const override { return callee->hasReturnValue(); }
+    void print(std::ostream &ostream) override { ostream << "call"; }
+    std::vector<Value *> getOperands() override { return {}; }
+    [[nodiscard]] const std::vector<Value *> &getFunctionArguments() const { return args; }
+    [[nodiscard]] const std::string &getCalleName() const { return callee->getName(); }
+};
+
+/*
+class IndirectCallInstruction : public CallInstruction {
+    Value *funcPtr;
+    std::vector<Value *> args;
+  public:
+    IndirectCallInstruction(Function *callee, Value *ptr, std::vector<Value *> args)
+        : CallInstruction(callee, std::move(args)), funcPtr(ptr) {}
+    std::vector<Value *> getOperands() override { return {funcPtr}; }
+};
+*/
 
 class BranchInstruction : public Instruction {
   public:

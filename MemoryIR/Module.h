@@ -21,7 +21,7 @@ class Module {
     std::unordered_map<std::string, Constant *> m_globals;
   public:
     explicit Module(IRContext *ctx) : m_context(ctx) {}
-    Function *createFunction(const std::string &name, const std::vector<std::string> &args);
+    Function *createFunction(const std::string &name, const std::vector<std::string> &args, bool isVoidType = true);
 };
 
 }

@@ -52,6 +52,13 @@ class IRBuilder {
         return dynamic_cast<BranchInstruction *>(createInstruction<BranchConditional>(cond, condTrue, condFalse));
     }
 
+    Value *createCallInstr(Function *callee, std::vector<Value *> args) {
+        return createInstruction<CallInstruction>(callee, std::move(args));
+    }
+//    Value *createPointerDecayCallInstr(Function *callee, Value *ptr, std::vector<Value *> args) {
+//        return createInstruction<IndirectCallInstruction>(callee, ptr, std::move(args));
+//    }
+
   private:
     template<typename InstrType, typename... Args>
     Instruction *createInstruction(Args &&... args) {

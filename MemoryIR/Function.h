@@ -28,13 +28,16 @@ class Function : public Value {
     std::string m_name;
     std::vector<Argument *> m_args;
     Block *m_entryBlock;
+    bool isVoidType;
   public:
-    Function(IRContext *ctx, std::string name, const std::vector<std::string> &args);
+    Function(IRContext *ctx, std::string name, const std::vector<std::string> &args, bool isVoidType = true);
     [[nodiscard]] std::vector<Block *> getFunctionBlocks() const;
     std::vector<Argument *> &getArgs() { return m_args; }
     void print(std::ostream &ostream) override;
     void setEntryBlock(Block *entryBlock) { m_entryBlock = entryBlock; }
     [[nodiscard]] bool hasBody() const { return m_entryBlock != nullptr; }
+    [[nodiscard]] bool hasReturnValue() const { return isVoidType; }
+    [[nodiscard]] const std::string &getName() const { return m_name; }
 };
 
 }

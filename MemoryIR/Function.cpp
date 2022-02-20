@@ -13,8 +13,8 @@
 
 namespace mipsir {
 
-Function::Function(IRContext *ctx, std::string name, const std::vector<std::string> &args)
-    : m_context(ctx), m_name(std::move(name)) {
+Function::Function(IRContext *ctx, std::string name, const std::vector<std::string> &args, bool isVoidType)
+    : m_context(ctx), m_name(std::move(name)), isVoidType(isVoidType), m_entryBlock(nullptr) {
     for (const auto &arg: args) {
         m_args.push_back(m_context->createArgument(name, arg));
     }
@@ -46,6 +46,15 @@ void Function::print(std::ostream &ostream) {
         labelAssignment[block] = "label_" + std::to_string(nextLabel++);
     }
 
+    const auto printLiteralOrRegister = [&](const auto &operand) {
+      if (virtualAssignment.count(operand)) {
+          ostream << "%" << virtualAssignment[operand];
+      } else {
+          operand->print(ostream);
+      }
+      ostream << " ";
+    };
+
     for (const auto &block: bodyBlocks) {
         ostream << "  " << labelAssignment[block] << ":" << std::endl;
         for (const auto &instr: block->getInstructions()) {
@@ -57,18 +66,21 @@ void Function::print(std::ostream &ostream) {
             ostream << " ";
 
             for (const auto &operand: instr->getOperands()) {
-                if (virtualAssignment.count(operand)) {
-                    ostream << "%" << virtualAssignment[operand];
-                } else {
-                    operand->print(ostream);
-                }
-                ostream << " ";
+                printLiteralOrRegister(operand);
             }
             const auto branch = dynamic_cast<BranchInstruction *>(instr);
             if (branch) {
                 for (const auto &out: branch->getOutbound()) {
                     ostream << labelAssignment[out] << " ";
                 }
+            }
+            const auto call = dynamic_cast<CallInstruction *>(instr);
+            if (call) {
+                ostream << call->getCalleName() << "( ";
+                for (const auto &arg: call->getFunctionArguments()) {
+                    printLiteralOrRegister(arg);
+                }
+                ostream << ")";
             }
             ostream << std::endl;
         }

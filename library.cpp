@@ -14,6 +14,8 @@ int main() {
     auto builder = std::make_unique<IRBuilder>(ctx.get());
     auto module = std::make_unique<Module>(ctx.get());
 
+    Function *callee = module->createFunction("random_function", {}, true);
+
     const std::vector<std::string> args{"a", "b"};
     Function *function = module->createFunction("add", args);
     Block *entryBlock = ctx->createBlock(function);
@@ -22,7 +24,7 @@ int main() {
     builder->setInsertPoint(entryBlock);
     Value *temp1 = function->getArgs()[0];
     Value *temp2 = function->getArgs()[1];
-    builder->createAddInstr(temp2, temp1);
+    builder->createCallInstr(callee, {temp1, temp2});
     builder->createBranch(exitBlock);
 
     builder->setInsertPoint(exitBlock);
