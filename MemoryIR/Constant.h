@@ -18,6 +18,7 @@ class IntegerConstant : public Constant {
   public:
     explicit IntegerConstant(int val) : value(val) {}
     void print(std::ostream &ostream) override { ostream << value; }
+    int getValue() const { return value; }
 };
 
 class GlobalVariable : public Constant {

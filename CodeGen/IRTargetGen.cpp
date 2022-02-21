@@ -32,14 +32,14 @@ void IRTargetGen::emitTargetInstruction(Instruction *instruction,
         emitStoreInstruction(ptrStoreInstruction, va, sa, st);
         return;
     }
-    auto ptrReturnInstruction = dynamic_cast<ReturnInstruction *>(instruction);
-    if (ptrReturnInstruction) {
-        emitReturnInstruction(ptrReturnInstruction, va, sa, st);
-        return;
-    }
     auto ptrValuedReturnInstruction = dynamic_cast<ValuedReturnInstruction *>(instruction);
     if (ptrValuedReturnInstruction) {
         emitValuedReturnInstruction(ptrValuedReturnInstruction, va, sa, st);
+        return;
+    }
+    auto ptrReturnInstruction = dynamic_cast<ReturnInstruction *>(instruction);
+    if (ptrReturnInstruction) {
+        emitReturnInstruction(ptrReturnInstruction, va, sa, st);
         return;
     }
     auto ptrLoadInstruction = dynamic_cast<LoadInstruction *>(instruction);

@@ -47,7 +47,7 @@ void JrInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void JrInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "jr $" << val << std::endl;
+    ostream << "jr    $" << val << std::endl;
 }
 
 void JalrInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -56,7 +56,7 @@ void JalrInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void JalrInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "jalr " << val << std::endl;
+    ostream << "jalr  " << val << std::endl;
 }
 
 void AddiInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -65,7 +65,7 @@ void AddiInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void AddiInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "addi $" << t << " $" << s << " " << i << std::endl;
+    ostream << "addi  $" << t << " $" << s << " " << i << std::endl;
 }
 
 void AddInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -74,7 +74,7 @@ void AddInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void AddInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "add $" << dest << " $" << s << " $" << t << std::endl;
+    ostream << "add   $" << dest << " $" << s << " $" << t << std::endl;
 }
 
 void SubInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -83,7 +83,7 @@ void SubInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void SubInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "sub $" << dest << " $" << s << " $" << t << std::endl;
+    ostream << "sub   $" << dest << " $" << s << " $" << t << std::endl;
 }
 
 void SltInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -92,7 +92,7 @@ void SltInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void SltInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "slt $" << dest << " $" << s << " $" << t << std::endl;
+    ostream << "slt   $" << dest << " $" << s << " $" << t << std::endl;
 }
 
 void SltuInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -101,7 +101,7 @@ void SltuInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void SltuInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "sltu $" << dest << " $" << s << " $" << t << std::endl;
+    ostream << "sltu  $" << dest << " $" << s << " $" << t << std::endl;
 
 }
 
@@ -122,9 +122,9 @@ void BeqInstr::emit(std::ostream &ostream, const LabelTable &table) {
 
 void BeqInstr::print(std::ostream &ostream, const LabelTable &table) {
     if (label.empty()) {
-        ostream << "beq $" << s << " $" << t << " " << i << std::endl;
+        ostream << "beq   $" << s << " $" << t << " " << i << std::endl;
     } else {
-        ostream << "beq $" << s << " $" << t << " " << label << std::endl;
+        ostream << "beq   $" << s << " $" << t << " " << label << std::endl;
     }
 }
 
@@ -145,9 +145,9 @@ void BneInstr::emit(std::ostream &ostream, const LabelTable &table) {
 
 void BneInstr::print(std::ostream &ostream, const LabelTable &table) {
     if (label.empty()) {
-        ostream << "bne $" << s << " $" << t << " " << i << std::endl;
+        ostream << "bne   $" << s << " $" << t << " " << i << std::endl;
     } else {
-        ostream << "bne $" << s << " $" << t << " " << label << std::endl;
+        ostream << "bne   $" << s << " $" << t << " " << label << std::endl;
     }
 }
 
@@ -157,7 +157,7 @@ void LisInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void LisInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "lis $" << d << std::endl;
+    ostream << "lis   $" << d << std::endl;
 }
 
 void MfloInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -166,7 +166,7 @@ void MfloInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void MfloInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "mflo $" << d << std::endl;
+    ostream << "mflo  $" << d << std::endl;
 
 }
 
@@ -176,7 +176,7 @@ void MfhiInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void MfhiInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "mfhi $" << d << std::endl;
+    ostream << "mfhi  $" << d << std::endl;
 }
 
 void MultInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -185,7 +185,7 @@ void MultInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void MultInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "mult $" << s << " $" << t << std::endl;
+    ostream << "mult  $" << s << " $" << t << std::endl;
 }
 
 void MultuInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -203,7 +203,7 @@ void DivInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void DivInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "div $" << s << " $" << t << std::endl;
+    ostream << "div   $" << s << " $" << t << std::endl;
 }
 
 void DivuInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -212,7 +212,7 @@ void DivuInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void DivuInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "divu $" << s << " $" << t << std::endl;
+    ostream << "divu  $" << s << " $" << t << std::endl;
 
 }
 
@@ -222,7 +222,7 @@ void LwInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void LwInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "lw $" << t << " " << i << "($" << s << ")" << std::endl;
+    ostream << "lw    $" << t << " " << i << "($" << s << ")" << std::endl;
 }
 
 void SwInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -231,25 +231,25 @@ void SwInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void SwInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "sw $" << t << " " << i << "($" << s << ")" << std::endl;
+    ostream << "sw    $" << t << " " << i << "($" << s << ")" << std::endl;
 }
 
 void JInstr::emit(std::ostream &ostream, const LabelTable &table) {
-    int instr = (1 << 27) | table.at(label);
+    int instr = (1 << 27) | (table.at(label) / 4);
     convert_to_binary(instr, ostream);
 }
 
 void JInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "j " << label << std::endl;
+    ostream << "j    " << label << std::endl;
 }
 
 void JalInstr::emit(std::ostream &ostream, const LabelTable &table) {
-    int instr = (1 << 27) | (1 << 26) | table.at(label);
+    int instr = (1 << 27) | (1 << 26) | (table.at(label) / 4);
     convert_to_binary(instr, ostream);
 }
 
 void JalInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "jal " << label << std::endl;
+    ostream << "jal   " << label << std::endl;
 }
 
 }

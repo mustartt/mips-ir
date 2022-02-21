@@ -39,10 +39,11 @@ void MipsIRTargetGen::emitCallInstruction(CallInstruction *instr,
         m_assembler->emitSw(30, va.at(arg), currOffset);
         currOffset += 4;
     }
-    m_assembler->emitSw(31, 30, 0);
+    m_assembler->emitSw(30, 31, 0);
     std::string funcCall = "func_" + instr->getCalleName();
     m_assembler->emitJal(funcCall);
-    m_assembler->emitLw(31, 30, 0);
+    m_assembler->emitAddi(va.at(instr), 3, 0);
+    m_assembler->emitLw(30, 31, 0);
 
     m_assembler->emitAddi(30, 30, (int)stackOffset);
 }
@@ -50,7 +51,7 @@ void MipsIRTargetGen::emitBranchUnconditional(BranchUnconditional *instr,
                                               const VRegisterAssignment &va,
                                               const SpillStackAssignment &sa,
                                               const SymbolTable &st) {
-    m_assembler->emitJ(st.at(instr->getOutbound()[0]));
+    m_assembler->emitBeq(0, 0, st.at(instr->getOutbound()[0]));
 }
 
 void MipsIRTargetGen::emitBranchConditional(BranchConditional *instr,
@@ -59,8 +60,8 @@ void MipsIRTargetGen::emitBranchConditional(BranchConditional *instr,
                                             const SymbolTable &st) {
     auto cond = instr->getOperands()[0];
     auto branches = instr->getOutbound();
-    m_assembler->emitBne(va.at(cond), 0, st.at(branches[1]));
-    m_assembler->emitJ(st.at(branches[0]));
+    m_assembler->emitBne(va.at(cond), 0, st.at(branches[0]));
+    m_assembler->emitBeq(0, 0, st.at(branches[1]));
 }
 
 void MipsIRTargetGen::emitStoreInstruction(StoreInstruction *instr,
@@ -91,7 +92,7 @@ void MipsIRTargetGen::emitLoadInstruction(LoadInstruction *instr,
                                           const SpillStackAssignment &sa,
                                           const SymbolTable &st) {
     auto operands = instr->getOperands();
-    m_assembler->emitLw(va.at(operands[1]), va.at(operands[0]), 0);
+    m_assembler->emitLw(va.at(instr), va.at(operands[0]), 0);
 }
 
 void MipsIRTargetGen::emitAddInstruction(AddInstruction *instr,
@@ -99,7 +100,17 @@ void MipsIRTargetGen::emitAddInstruction(AddInstruction *instr,
                                          const SpillStackAssignment &sa,
                                          const SymbolTable &st) {
     auto operands = instr->getOperands();
-    m_assembler->emitAdd(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+    auto lhs = dynamic_cast<IntegerConstant *>(operands[0]);
+    auto rhs = dynamic_cast<IntegerConstant *>(operands[1]);
+    if (lhs && rhs) {
+        m_assembler->emitAddi(va.at(instr), 0, lhs->getValue() + rhs->getValue());
+    } else if (lhs) {
+        m_assembler->emitAddi(va.at(instr), va.at(operands[1]), lhs->getValue());
+    } else if (rhs) {
+        m_assembler->emitAddi(va.at(instr), va.at(operands[0]), rhs->getValue());
+    } else {
+        m_assembler->emitAdd(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+    }
 }
 
 void MipsIRTargetGen::emitSubInstruction(SubInstruction *instr,
@@ -107,7 +118,18 @@ void MipsIRTargetGen::emitSubInstruction(SubInstruction *instr,
                                          const SpillStackAssignment &sa,
                                          const SymbolTable &st) {
     auto operands = instr->getOperands();
-    m_assembler->emitSub(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+    auto lhs = dynamic_cast<IntegerConstant *>(operands[0]);
+    auto rhs = dynamic_cast<IntegerConstant *>(operands[1]);
+    if (lhs && rhs) {
+        m_assembler->emitAddi(va.at(instr), 0, lhs->getValue() - rhs->getValue());
+    } else if (lhs) {
+        m_assembler->emitSub(va.at(instr), 0, va.at(operands[1]));
+        m_assembler->emitAddi(va.at(instr), va.at(instr), lhs->getValue());
+    } else if (rhs) {
+        m_assembler->emitAddi(va.at(instr), va.at(operands[0]), -rhs->getValue());
+    } else {
+        m_assembler->emitSub(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+    }
 }
 
 void MipsIRTargetGen::emitMulInstruction(MulInstruction *instr,
@@ -134,12 +156,40 @@ void MipsIRTargetGen::emitCmpInstruction(CmpInstruction *instr,
                                          const SymbolTable &st) {
     auto operands = instr->getOperands();
     switch (instr->getOperator()) {
-        case CmpInstruction::CmpOp::Equal: { break; }
-        case CmpInstruction::CmpOp::NotEqual: { break; }
-        case CmpInstruction::CmpOp::LessThan: { break; }
-        case CmpInstruction::CmpOp::GreaterThan: { break; }
-        case CmpInstruction::CmpOp::LessThanEqual: { break; }
-        case CmpInstruction::CmpOp::GreaterThanEqual: { break; }
+        case CmpInstruction::CmpOp::Equal: {
+            m_assembler->emitSub(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+            m_assembler->emitBeq(va.at(instr), 0, 2);
+            m_assembler->emitAddi(va.at(instr), 0, 0);
+            m_assembler->emitBeq(0, 0, 1);
+            m_assembler->emitAddi(va.at(instr), 0, 1);
+            break;
+        }
+        case CmpInstruction::CmpOp::NotEqual: {
+            m_assembler->emitSub(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+            m_assembler->emitBeq(va.at(instr), 0, 2);
+            m_assembler->emitAddi(va.at(instr), 0, 1);
+            m_assembler->emitBeq(0, 0, 1);
+            m_assembler->emitAddi(va.at(instr), 0, 0);
+            break;
+        }
+        case CmpInstruction::CmpOp::LessThan: {
+            m_assembler->emitSlt(va.at(instr), va.at(operands[0]), va.at(operands[1]));
+            break;
+        }
+        case CmpInstruction::CmpOp::GreaterThan: {
+            m_assembler->emitSlt(va.at(instr), va.at(operands[1]), va.at(operands[0]));
+            break;
+        }
+        case CmpInstruction::CmpOp::LessThanEqual: {
+            m_assembler->emitAddi(va.at(instr), va.at(operands[1]), 1);
+            m_assembler->emitSlt(va.at(instr), va.at(operands[0]), va.at(instr));
+            break;
+        }
+        case CmpInstruction::CmpOp::GreaterThanEqual: {
+            m_assembler->emitAddi(va.at(instr), va.at(operands[0]), 1);
+            m_assembler->emitSlt(va.at(instr), va.at(operands[1]), va.at(instr));
+            break;
+        }
     }
 }
 }

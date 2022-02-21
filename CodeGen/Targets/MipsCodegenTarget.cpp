@@ -51,6 +51,7 @@ void MipsCodegenTarget::emitFunction(Function *function) {
         blockLabelTable[block] = functionLabelName + "__label_" + std::to_string(blockIndex++);
     }
     for (auto block: bodyBlocks) {
+        m_assembler->insertLabel(blockLabelTable.at(block));
         for (auto instr: block->getInstructions()) {
             m_targetGen->emitTargetInstruction(instr, VA, SA, blockLabelTable);
         }

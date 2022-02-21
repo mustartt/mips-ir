@@ -181,12 +181,14 @@ void Assembler::emitAddi(Register t, Register s, int i) {
 
 void Assembler::emitJ(std::string label) {
     auto JIns = std::make_unique<JInstr>(std::move(label));
+    JIns->currOffset = m_instrOffset;
     m_program.push_back(std::move(JIns));
     incrementOffset();
 }
 
 void Assembler::emitJal(std::string label) {
     auto JalIns = std::make_unique<JalInstr>(std::move(label));
+    JalIns->currOffset = m_instrOffset;
     m_program.push_back(std::move(JalIns));
     incrementOffset();
 }
