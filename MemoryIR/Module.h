@@ -29,6 +29,9 @@ class Module {
     GlobalVariable *createGlobal(const std::string &name, std::vector<int> values);
 
     void print(std::ostream &ostream) const;
+
+    const std::unordered_map<std::string, Function *> &getFunctionTable() const { return m_functions; }
+    const std::unordered_map<std::string, Constant *> &getGlobalTable() const { return m_globals; }
 };
 
 }

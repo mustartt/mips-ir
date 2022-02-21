@@ -3,11 +3,15 @@
 #include <iostream>
 #include <memory>
 
+#include "Assembler/Assembler.h"
+
 #include "MemoryIR/IRContext.h"
 #include "MemoryIR/IRbuilder.h"
 #include "MemoryIR/Module.h"
 #include "RegisterAllocation/InterferenceGraph.h"
 #include "RegisterAllocation/LivenessAnalyzer.h"
+#include "CodeGen/Targets/MipsCodegenTarget.h"
+#include "CodeGen/Targets/MipsIRTargetGen.h"
 
 int main() {
     using namespace mipsir;
@@ -23,18 +27,16 @@ int main() {
     Value *a = function->getArgs()[0];
     Value *b = function->getArgs()[1];
     Value *c = builder->createAddInstr(a, b);
-    Value *d = ctx->createConstantInt(3);
-
-    builder->createReturn(builder->createAddInstr(d, c));
-
+    builder->createReturn(c);
     module->print(std::cout);
 
-    InterferenceGraph g = LivenessAnalyzer::constructRegisterInterferenceGraph(function);
-    g.color();
-    auto coloring = g.getColoring();
-    for (auto &pair: coloring) {
-        std::cout << "%" << pair.first << " -> " << pair.second << std::endl;
-    }
+    assembler::Assembler assembler;
+    auto cgIRTarget = std::make_unique<MipsIRTargetGen>(&assembler);
+    auto cgTarget = std::make_unique<MipsCodegenTarget>(cgIRTarget.get(), &assembler);
+
+    cgTarget->generateAssembly(*module);
+    std::cout << "========== Assembler Output ==========" << std::endl;
+    assembler.print(std::cout);
 
     return 0;
 }

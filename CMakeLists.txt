@@ -6,9 +6,11 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(Assembler)
 add_subdirectory(MemoryIR)
 add_subdirectory(RegisterAllocation)
+add_subdirectory(CodeGen)
 
 add_executable(MIPS_IR library.h library.cpp)
 
 target_link_libraries(MIPS_IR LINK_PUBLIC assembler)
 target_link_libraries(MIPS_IR LINK_PUBLIC memoryir)
-target_link_libraries(MIPS_IR LINK_PUBLIC registeralloc)
+target_link_libraries(MIPS_IR LINK_PUBLIC allocation)
+target_link_libraries(MIPS_IR LINK_PUBLIC codegen)
