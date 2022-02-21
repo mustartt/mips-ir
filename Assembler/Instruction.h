@@ -207,6 +207,22 @@ class SwInstr : public Instruction {
     void print(std::ostream &ostream, const LabelTable &table) override;
 };
 
+class JInstr : public Instruction {
+    std::string label;
+  public:
+    explicit JInstr(std::string label) : label(std::move(label)) {}
+    void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
+};
+
+class JalInstr : public Instruction {
+    std::string label;
+  public:
+    explicit JalInstr(std::string label) : label(std::move(label)) {}
+    void emit(std::ostream &ostream, const LabelTable &table) override;
+    void print(std::ostream &ostream, const LabelTable &table) override;
+};
+
 }
 
 #endif //MIPS_IR_ASSEMBLER_INSTRUCTION_H_

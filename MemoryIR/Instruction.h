@@ -169,6 +169,7 @@ class CmpInstruction : public BinaryInstruction {
     CmpInstruction(CmpInstruction::CmpOp op, Value *lhs, Value *rhs)
         : BinaryInstruction(lhs, rhs), op(op) {}
     void print(std::ostream &ostream) override { ostream << "cmp " << getEnumCmp(op); }
+    [[nodiscard]] CmpOp getOperator() const { return op; }
 };
 
 }

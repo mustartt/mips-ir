@@ -42,7 +42,8 @@ void RegisterAllocator::assignRegister() {
         std::unordered_map<Value *, MachineRegister> valueMap;
         auto vAssignment = LivenessAnalyzer::getVirtualRegisterAssignment(m_function);
         for (const auto &[reg, vRegId]: vAssignment) {
-            valueMap[reg] = m_machineRegisterMapping[coloring[vRegId] - 1];
+            auto machineRegisterIndex = coloring[vRegId] - 1;
+            valueMap[reg] = m_machineRegisterMapping[machineRegisterIndex];
         }
         m_registerAssignment = valueMap;
     } else {

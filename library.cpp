@@ -21,12 +21,18 @@ int main() {
     auto module = std::make_unique<Module>(ctx.get());
     const std::vector<std::string> args{"a", "b"};
     Function *function = module->createFunction("add", args);
-    Block *entryBlock = ctx->createBlock(function);
 
+    const std::vector<std::string> argsMultiply{"x1", "x2"};
+    Function *callee = module->createFunction("multiply", argsMultiply);
+    Block *calleBlock = ctx->createBlock(callee);
+    builder->setInsertPoint(calleBlock);
+    builder->createReturn(builder->createMulInstr(callee->getArgs()[0], callee->getArgs()[1]));
+
+    Block *entryBlock = ctx->createBlock(function);
     builder->setInsertPoint(entryBlock);
     Value *a = function->getArgs()[0];
     Value *b = function->getArgs()[1];
-    Value *c = builder->createAddInstr(a, b);
+    Value *c = builder->createCallInstr(callee, {a, b});
     builder->createReturn(c);
     module->print(std::cout);
 

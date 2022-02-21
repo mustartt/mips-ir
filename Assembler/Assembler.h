@@ -35,6 +35,9 @@ class Assembler {
     void emitJr(Register val);
     void emitJalr(Register val);
 
+    void emitJ(std::string label);
+    void emitJal(std::string label);
+
     void emitAdd(Register d, Register s, Register t);
     void emitSub(Register d, Register s, Register t);
 

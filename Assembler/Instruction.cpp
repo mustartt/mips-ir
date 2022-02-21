@@ -65,7 +65,7 @@ void AddiInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void AddiInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "add $" << t << " $" << s << " " << i << std::endl;
+    ostream << "addi $" << t << " $" << s << " " << i << std::endl;
 }
 
 void AddInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -222,7 +222,7 @@ void LwInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void LwInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "lw $" << t << " $" << i << "($" << s << ")" << std::endl;
+    ostream << "lw $" << t << " " << i << "($" << s << ")" << std::endl;
 }
 
 void SwInstr::emit(std::ostream &ostream, const LabelTable &table) {
@@ -231,7 +231,25 @@ void SwInstr::emit(std::ostream &ostream, const LabelTable &table) {
 }
 
 void SwInstr::print(std::ostream &ostream, const LabelTable &table) {
-    ostream << "sw $" << t << " $" << i << "($" << s << ")" << std::endl;
+    ostream << "sw $" << t << " " << i << "($" << s << ")" << std::endl;
+}
+
+void JInstr::emit(std::ostream &ostream, const LabelTable &table) {
+    int instr = (1 << 27) | table.at(label);
+    convert_to_binary(instr, ostream);
+}
+
+void JInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "j " << label << std::endl;
+}
+
+void JalInstr::emit(std::ostream &ostream, const LabelTable &table) {
+    int instr = (1 << 27) | (1 << 26) | table.at(label);
+    convert_to_binary(instr, ostream);
+}
+
+void JalInstr::print(std::ostream &ostream, const LabelTable &table) {
+    ostream << "jal " << label << std::endl;
 }
 
 }

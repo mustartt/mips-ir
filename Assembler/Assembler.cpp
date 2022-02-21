@@ -26,6 +26,7 @@ void Assembler::print(std::ostream &ostream) {
     size_t offset = 0;
     for (auto &instr: m_program) {
         if (labels.count(offset)) ostream << labels[offset] << ": " << std::endl;
+        ostream << "    ";
         instr->print(ostream, m_symbolTable);
         offset += 4;
     }
@@ -175,6 +176,18 @@ void Assembler::emitSw(Register s, Register t, int i) {
 void Assembler::emitAddi(Register t, Register s, int i) {
     auto AddiIns = std::make_unique<AddiInstr>(t, s, i);
     m_program.push_back(std::move(AddiIns));
+    incrementOffset();
+}
+
+void Assembler::emitJ(std::string label) {
+    auto JIns = std::make_unique<JInstr>(std::move(label));
+    m_program.push_back(std::move(JIns));
+    incrementOffset();
+}
+
+void Assembler::emitJal(std::string label) {
+    auto JalIns = std::make_unique<JalInstr>(std::move(label));
+    m_program.push_back(std::move(JalIns));
     incrementOffset();
 }
 

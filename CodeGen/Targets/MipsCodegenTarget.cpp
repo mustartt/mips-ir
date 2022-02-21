@@ -20,7 +20,7 @@ void MipsCodegenTarget::generateAssembly(const Module &module) {
 
     }
     for (const auto &[name, function]: module.getFunctionTable()) {
-        emitFunction(function);
+        if (function->hasBody()) emitFunction(function);
     }
 }
 
@@ -38,6 +38,12 @@ void MipsCodegenTarget::emitFunction(Function *function) {
     allocator.debugAssignment(std::cout); // debug
     VRegisterAssignment VA = allocator.getRegisterAssignment();
     SpillStackAssignment SA = allocator.getSpillAssignment();
+
+    int offset = -4;
+    for (auto arg: function->getArgs()) {
+        m_assembler->emitLw(30, VA.at(arg), offset);
+        offset -= 4;
+    }
 
     auto bodyBlocks = function->getFunctionBlocks();
     uint32_t blockIndex = 0;
