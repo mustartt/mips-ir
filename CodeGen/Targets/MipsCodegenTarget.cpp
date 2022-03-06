@@ -35,13 +35,19 @@ void MipsCodegenTarget::emitFunction(Function *function) {
 
     RegisterAllocator allocator(function, {8, 9, 10, 11, 12, 13, 14, 15, 24, 25});
     allocator.assignRegister();
-    allocator.debugAssignment(std::cout); // debug
     VRegisterAssignment VA = allocator.getRegisterAssignment();
     SpillStackAssignment SA = allocator.getSpillAssignment();
 
+    MachineRegister startingParamRegister = 4;
+    for (size_t i = 0; i < std::min(function->getArgs().size(), (size_t)4); ++i) {
+        VA[function->getArgs()[i]] = startingParamRegister++;
+    }
+
+    RegisterAllocator::debugAssignment(function, VA, SA, std::cout); // debug
+
     int offset = -4;
-    for (auto arg: function->getArgs()) {
-        m_assembler->emitLw(30, VA.at(arg), offset);
+    for (size_t i = 4; i < function->getArgs().size(); ++i) {
+        m_assembler->emitLw(30, VA.at(function->getArgs()[i]), offset);
         offset -= 4;
     }
 

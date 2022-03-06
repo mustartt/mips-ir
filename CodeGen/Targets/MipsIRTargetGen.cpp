@@ -2,7 +2,11 @@
 // Created by henry on 2022-02-20.
 //
 
+
 #include "MipsIRTargetGen.h"
+
+#include <set>
+
 #include "../../MemoryIR/Constant.h"
 #include "../../MemoryIR/Instruction.h"
 #include "../../Assembler/Assembler.h"
@@ -28,24 +32,50 @@ namespace mipsir {
  *  ---stack top---
  */
 
+std::set<MachineRegister> getUsedRegisters(const VRegisterAssignment &va) {
+    std::set<MachineRegister> used;
+    for (const auto &[val, reg]: va) used.insert(reg);
+    return used;
+}
+
 void MipsIRTargetGen::emitCallInstruction(CallInstruction *instr,
                                           const VRegisterAssignment &va,
                                           const SpillStackAssignment &sa,
                                           const SymbolTable &st) {
-    size_t stackOffset = (instr->getFunctionArguments().size() + 1) * 4;
-    m_assembler->emitAddi(30, 30, -((int)stackOffset));
-    int currOffset = 4 - (int)stackOffset;
-    for (auto arg: instr->getFunctionArguments()) {
-        m_assembler->emitSw(30, va.at(arg), currOffset);
+    auto registerToSave = getUsedRegisters(va);
+    int stackArgCount = std::max(((int)instr->getFunctionArguments().size()) - 4, 0);
+    int stackOffset = (stackArgCount + 1 + (int)registerToSave.size()) * 4;
+
+    m_assembler->emitAddi(30, 30, -stackOffset);
+    int currOffset = 4 - stackOffset;
+    for (size_t i = 4; i < instr->getFunctionArguments().size(); ++i) {
+        m_assembler->emitSw(30, va.at(instr->getFunctionArguments()[i]), -currOffset);
         currOffset += 4;
     }
+    for (auto toSave: registerToSave) {
+        m_assembler->emitSw(30, toSave, -currOffset);
+        currOffset += 4;
+    }
+
     m_assembler->emitSw(30, 31, 0);
+
+    MachineRegister startingParamRegister = 4;
+    for (size_t i = 0; i < std::min((int)instr->getFunctionArguments().size(), 4); ++i) {
+        auto reg = instr->getFunctionArguments()[i];
+        m_assembler->emitAddi(startingParamRegister, va.at(reg), 0);
+        startingParamRegister++;
+    }
+
     std::string funcCall = "func_" + instr->getCalleName();
     m_assembler->emitJal(funcCall);
-    m_assembler->emitAddi(va.at(instr), 3, 0);
     m_assembler->emitLw(30, 31, 0);
 
-    m_assembler->emitAddi(30, 30, (int)stackOffset);
+    for (auto itr = registerToSave.cbegin(); itr != registerToSave.cend(); ++itr) {
+        currOffset -= 4;
+        m_assembler->emitLw(30, *itr, -currOffset);
+    }
+    m_assembler->emitAddi(va.at(instr), 3, 0);
+    m_assembler->emitAddi(30, 30, stackOffset);
 }
 void MipsIRTargetGen::emitBranchUnconditional(BranchUnconditional *instr,
                                               const VRegisterAssignment &va,

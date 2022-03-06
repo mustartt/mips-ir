@@ -18,14 +18,17 @@ RegisterAllocator::RegisterAllocator(Function *function, std::vector<MachineRegi
     : m_function(function),
       m_machineRegisterMapping(std::move(machineRegisterMapping)) {}
 
-void RegisterAllocator::debugAssignment(std::ostream &ostream) {
+void RegisterAllocator::debugAssignment(Function *function,
+                                        VRegisterAssignment &va,
+                                        SpillStackAssignment &sa,
+                                        std::ostream &ostream) {
     ostream << "========== Register Assignment Output ==========" << std::endl;
-    auto assignment = LivenessAnalyzer::getVirtualRegisterAssignment(m_function);
+    auto assignment = LivenessAnalyzer::getVirtualRegisterAssignment(function);
     for (auto &[reg, regID]: assignment) {
-        if (m_registerAssignment.count(reg)) {
-            ostream << " %" << regID << " := $" << m_registerAssignment.at(reg) << std::endl;
+        if (va.count(reg)) {
+            ostream << " %" << regID << " := $" << va.at(reg) << std::endl;
         } else {
-            ostream << " %" << regID << " := stack(" << m_registerSpill.at(reg) << ")" << std::endl;
+            ostream << " %" << regID << " := stack(" << sa.at(reg) << ")" << std::endl;
         }
     }
 }

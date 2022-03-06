@@ -37,7 +37,10 @@ class RegisterAllocator {
     const VRegisterAssignment &getRegisterAssignment() { return m_registerAssignment; }
     const SpillStackAssignment &getSpillAssignment() { return m_registerSpill; }
 
-    void debugAssignment(std::ostream &ostream);
+    static void debugAssignment(Function *function,
+                                VRegisterAssignment &va,
+                                SpillStackAssignment &sa,
+                                std::ostream &ostream);
     void assignRegister();
 };
 
