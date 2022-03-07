@@ -70,9 +70,9 @@ void MipsIRTargetGen::emitCallInstruction(CallInstruction *instr,
     m_assembler->emitJal(funcCall);
     m_assembler->emitLw(30, 31, 0);
 
-    for (auto itr = registerToSave.cbegin(); itr != registerToSave.cend(); ++itr) {
+    for (unsigned int itr: registerToSave) {
         currOffset -= 4;
-        m_assembler->emitLw(30, *itr, -currOffset);
+        m_assembler->emitLw(30, itr, stackOffset + currOffset);
     }
     m_assembler->emitAddi(va.at(instr), 3, 0);
     m_assembler->emitAddi(30, 30, stackOffset);

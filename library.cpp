@@ -19,7 +19,7 @@ void generateEntryPoint(assembler::Assembler &assembler) {
     assembler.emitAddi(4, 1, 0);
     assembler.emitAddi(30, 30, -4);
     assembler.emitSw(30, 31, 0);
-    assembler.emitJal("func_factorial");
+    assembler.emitJal("func_fibonacci");
     assembler.emitLw(30, 31, 0);
     assembler.emitAddi(30, 30, 4);
     assembler.emitJr(31);
@@ -34,7 +34,7 @@ int main() {
     auto module = std::make_unique<Module>(ctx.get());
 
     const std::vector<std::string> args{"n"};
-    Function *function = module->createFunction("factorial", args);
+    Function *function = module->createFunction("fibonacci", args);
     Block *entry = ctx->createBlock(function);
     Block *baseCase = ctx->createBlock(function);
     Block *recursiveCase = ctx->createBlock(function);
@@ -44,9 +44,8 @@ int main() {
     Value *num1 = ctx->createConstantInt(1);
     Value *num2 = ctx->createConstantInt(2);
     Value *cmp = builder->createCmpInstruction(
-        CmpInstruction::CmpOp::LessThan,
-        function->getArgs()[0],
-        builder->createAddInstr(num2, num0));
+        CmpInstruction::CmpOp::LessThanEqual, function->getArgs()[0],
+        builder->createAddInstr(num0, num1));
     builder->createBranch(cmp, baseCase, recursiveCase);
 
     builder->setInsertPoint(baseCase);
@@ -54,9 +53,12 @@ int main() {
 
     builder->setInsertPoint(recursiveCase);
 
-    builder->createReturn(builder->createMulInstr(
-        function->getArgs()[0],
-        builder->createCallInstr(function, {builder->createSubInstr(function->getArgs()[0], num1)})
+    Value *leftCase = builder->createSubInstr(function->getArgs()[0], num1);
+    Value *rightCase = builder->createSubInstr(function->getArgs()[0], num2);
+
+    builder->createReturn(builder->createAddInstr(
+        builder->createCallInstr(function, {leftCase}),
+        builder->createCallInstr(function, {rightCase})
     ));
 
     module->print(std::cout);
